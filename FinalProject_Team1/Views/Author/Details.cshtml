@@ -1,0 +1,78 @@
+@model FinalProject_Team1.Models.Author
+
+@{
+    ViewData["Title"] = "Author Details";
+}
+
+<div class="container mt-4">
+    <h1>Author Details</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>@Model.Name</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.BirthDate)</dt>
+                <dd class="col-sm-9">
+                    @(Model.BirthDate.HasValue ? Model.BirthDate.Value.ToString("yyyy-MM-dd") : "Unknown")
+                </dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DeathDate)</dt>
+                <dd class="col-sm-9">
+                    @(Model.DeathDate.HasValue ? Model.DeathDate.Value.ToString("yyyy-MM-dd") : "Unknown")
+                </dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Bio)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Bio)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Books by @Model.Name</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.BookAuthors != null && Model.BookAuthors.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Published</th>
+                                <th>Pages</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bookAuthor in Model.BookAuthors)
+                            {
+                                <tr>
+                                    <td>@bookAuthor.Book.Title</td>
+                                    <td>
+                                        @(bookAuthor.Book.PublishDate.HasValue ? bookAuthor.Book.PublishDate.Value.ToString("yyyy-MM-dd") : "Unknown")
+                                    </td>
+                                    <td>@bookAuthor.Book.NumberOfPages</td>
+                                    <td>
+                                        <a asp-controller="Book" asp-action="Details" asp-route-id="@bookAuthor.BookId" class="btn btn-sm btn-info">View</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No books found for this author.</p>
+            }
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
