@@ -1,0 +1,455 @@
+@{
+    ViewData["Title"] = "Data Visualization";
+    Layout = "_Layout";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .dashboard-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        height: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stat-card .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .display-4 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .stat-card .icon {
+        font-size: 2rem;
+        opacity: 0.8;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .viz-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        background-color: white;
+        margin-bottom: 2rem;
+    }
+    
+    .viz-card .card-header {
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+    
+    .viz-card .card-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .viz-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .text-muted {
+        font-size: 0.9rem;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Custom gradient backgrounds for stat cards */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+    }
+    
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="dashboard-header">
+        <h1 class="mb-2">Book Statistics Dashboard</h1>
+        <p class="lead mb-0">Visual insights into your book collection, authors, and publication trends</p>
+    </div>
+
+    @if (ViewBag.DatabaseError != null)
+    {
+        <div class="alert alert-danger">
+            <h4>Database Connection Error</h4>
+            <p>@ViewBag.DatabaseError</p>
+            @if(ViewBag.DatabaseError != null && ViewBag.DatabaseError.ToString().Contains(":") && ViewBag.DatabaseError.ToString().Split(':').Length > 1)
+            {
+                <div class="alert alert-warning mt-2">
+                    <strong>Technical Details:</strong>
+                    <pre style="white-space:pre-wrap;word-break:break-word;">@ViewBag.DatabaseError</pre>
+                </div>
+            }
+            <p>Please ensure your database connection is properly configured in appsettings.json.</p>
+            <p>You can still navigate to other parts of the application:</p>
+            <div class="mt-3">
+                <a href="/Home/Index" class="btn btn-primary">Home</a>
+                <a href="/Book/Index" class="btn btn-secondary">Books</a>
+                <a href="/Author/Index" class="btn btn-secondary">Authors</a>
+                <a href="/Subject/Index" class="btn btn-secondary">Subjects</a>
+            </div>
+        </div>
+    }
+    else if (ViewBag.UsingSampleData != null && ViewBag.UsingSampleData)
+    {
+        <div class="alert alert-info">
+            <h4>Using Sample Data</h4>
+            <p>This page is currently displaying sample data instead of querying the database.</p>
+            <p>@(ViewBag.DatabaseMessage ?? "This was done to ensure the page loads quickly while database connection issues are being resolved.")</p>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-4">
+            <div class="col-md-3 mb-4">
+                <div class="stat-card text-white bg-gradient-primary">
+                    <div class="card-body">
+                        <i class="fas fa-book icon"></i>
+                        <h5 class="card-title">Total Books</h5>
+                        <p class="card-text display-4">@ViewBag.TotalBooks</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card text-white bg-gradient-success">
+                    <div class="card-body">
+                        <i class="fas fa-users icon"></i>
+                        <h5 class="card-title">Total Authors</h5>
+                        <p class="card-text display-4">@ViewBag.TotalAuthors</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card text-white bg-gradient-info">
+                    <div class="card-body">
+                        <i class="fas fa-tags icon"></i>
+                        <h5 class="card-title">Total Subjects</h5>
+                        <p class="card-text display-4">@ViewBag.TotalSubjects</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card text-white bg-gradient-warning">
+                    <div class="card-body">
+                        <i class="fas fa-file-alt icon"></i>
+                        <h5 class="card-title">Avg. Pages</h5>
+                        <p class="card-text display-4">@Math.Round(ViewBag.AveragePages)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="viz-card">
+                    <div class="card-header">
+                        <h2>Books by Author</h2>
+                        <p class="text-muted">Top authors by number of books</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="booksPerAuthorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="viz-card">
+                    <div class="card-header">
+                        <h2>Top Subjects</h2>
+                        <p class="text-muted">Most common book subjects in the collection</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="topSubjectsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <div class="viz-card">
+                    <div class="card-header">
+                        <h2>Page Count Distribution</h2>
+                        <p class="text-muted">Distribution of books by page count ranges</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pageDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <script>
+        // Parse JSON data from ViewBag
+        const booksPerAuthorData = @Html.Raw(ViewBag.BooksPerAuthorData);
+        const topSubjectsData = @Html.Raw(ViewBag.TopSubjectsData);
+        const pageDistributionData = @Html.Raw(ViewBag.PageDistributionData);
+        
+        // Custom colors for charts
+        const gradientColors = [
+            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+            '#6a11cb', '#2575fc', '#13855c', '#258391', '#dda20a'
+        ];
+        
+        // Books per Author Chart
+        const booksPerAuthorCtx = document.getElementById('booksPerAuthorChart');
+        if (booksPerAuthorCtx) {
+            const ctx = booksPerAuthorCtx.getContext('2d');
+            
+            // Create gradient backgrounds
+            const gradients = booksPerAuthorData.map((_, index) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                const colorIndex = index % gradientColors.length;
+                gradient.addColorStop(0, gradientColors[colorIndex]);
+                gradient.addColorStop(1, gradientColors[(colorIndex + 1) % gradientColors.length]);
+                return gradient;
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: booksPerAuthorData.map(item => item.authorName),
+                    datasets: [{
+                        label: 'Number of Books',
+                        data: booksPerAuthorData.map(item => item.bookCount),
+                        backgroundColor: gradients,
+                        borderWidth: 0,
+                        borderRadius: 5,
+                        maxBarThickness: 50
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 15,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+        
+        // Top Subjects Chart
+        const topSubjectsCtx = document.getElementById('topSubjectsChart');
+        if (topSubjectsCtx) {
+            new Chart(topSubjectsCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: topSubjectsData.map(item => item.subjectName),
+                    datasets: [{
+                        data: topSubjectsData.map(item => item.bookCount),
+                        backgroundColor: gradientColors.slice(0, topSubjectsData.length),
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 15,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+        
+        // Page Distribution Chart
+        const pageDistributionCtx = document.getElementById('pageDistributionChart');
+        if (pageDistributionCtx) {
+            const ctx = pageDistributionCtx.getContext('2d');
+            
+            // Create gradient backgrounds
+            const gradients = pageDistributionData.map((_, index) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                const colorIndex = index % gradientColors.length;
+                gradient.addColorStop(0, gradientColors[colorIndex]);
+                gradient.addColorStop(1, gradientColors[(colorIndex + 1) % gradientColors.length]);
+                return gradient;
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: pageDistributionData.map(item => item.range),
+                    datasets: [{
+                        label: 'Number of Books',
+                        data: pageDistributionData.map(item => item.count),
+                        backgroundColor: gradients,
+                        borderWidth: 0,
+                        borderRadius: 5,
+                        maxBarThickness: 100
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 15,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+    </script>
+}
