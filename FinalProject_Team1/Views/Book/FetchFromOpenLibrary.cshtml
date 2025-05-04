@@ -1,0 +1,67 @@
+@{
+    ViewData["Title"] = "Fetch from Open Library";
+}
+
+<div class="container mt-4">
+    <h1>Fetch Book from Open Library</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Enter ISBN</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Enter an ISBN (10 or 13 digit) to fetch book data from the Open Library API.
+                    </p>
+                    
+                    <form asp-action="FetchFromOpenLibrary" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="form-group">
+                            <label for="isbn" class="control-label">ISBN</label>
+                            <input type="text" id="isbn" name="isbn" class="form-control" placeholder="Enter ISBN-10 or ISBN-13" required />
+                            <small class="form-text text-muted">Example: 9780451524935 or 0451524934</small>
+                        </div>
+                        
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-primary">Fetch Book Data</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4>About Open Library API</h4>
+                </div>
+                <div class="card-body">
+                    <p>
+                        The Open Library API provides access to book metadata from the Internet Archive's Open Library project.
+                    </p>
+                    <p>
+                        When you enter an ISBN, the system will:
+                    </p>
+                    <ul>
+                        <li>Fetch book details (title, author, publication date, etc.)</li>
+                        <li>Pre-fill the book creation form with this data</li>
+                        <li>Allow you to review and modify before saving</li>
+                    </ul>
+                    <p>
+                        <a href="https://openlibrary.org/dev/docs/api/books" target="_blank" class="btn btn-outline-info">
+                            Learn More About Open Library API
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
