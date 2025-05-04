@@ -1,0 +1,133 @@
+@model FinalProject_Team1.Models.Book
+
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="container mt-4">
+    <h1>Edit Book</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="BookId" />
+                
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="ISBN13" class="control-label">ISBN</label>
+                            <input asp-for="ISBN13" class="form-control" />
+                            <span asp-validation-for="ISBN13" class="text-danger"></span>
+                            <small class="form-text text-muted">Enter ISBN-10 or ISBN-13 format</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="PublishDate" class="control-label"></label>
+                            <input asp-for="PublishDate" class="form-control" type="date" />
+                            <span asp-validation-for="PublishDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="NumberOfPages" class="control-label"></label>
+                            <input asp-for="NumberOfPages" class="form-control" />
+                            <span asp-validation-for="NumberOfPages" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="CoverUrl" class="control-label"></label>
+                    <input asp-for="CoverUrl" class="form-control" />
+                    <span asp-validation-for="CoverUrl" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedAuthors">Authors</label>
+                    <select id="selectedAuthors" name="selectedAuthors" class="form-control" multiple>
+                        @{
+                            var selectedAuthors = ViewBag.SelectedAuthors as List<int>;
+                            if (ViewBag.Authors != null)
+                            {
+                                foreach (var author in ViewBag.Authors as SelectList)
+                                {
+                                    if (selectedAuthors != null && author?.Value != null && selectedAuthors.Contains(int.Parse(author.Value)))
+                                    {
+                                        <option value="@author.Value" selected>@author.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@author.Value">@author.Text</option>
+                                    }
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedSubjects">Subjects</label>
+                    <select id="selectedSubjects" name="selectedSubjects" class="form-control" multiple>
+                        @{
+                            var selectedSubjects = ViewBag.SelectedSubjects as List<int>;
+                            if (ViewBag.Subjects != null)
+                            {
+                                foreach (var subject in ViewBag.Subjects as SelectList)
+                                {
+                                    if (selectedSubjects != null && subject?.Value != null && selectedSubjects.Contains(int.Parse(subject.Value)))
+                                    {
+                                        <option value="@subject.Value" selected>@subject.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@subject.Value">@subject.Text</option>
+                                    }
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                
+                <div class="form-group mt-3">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.CoverUrl))
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5>Book Cover</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="@Model.CoverUrl" alt="@Model.Title" class="img-fluid" style="max-height: 300px;" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

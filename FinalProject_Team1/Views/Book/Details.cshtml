@@ -1,0 +1,79 @@
+@model FinalProject_Team1.Models.Book
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-4">
+    <h1>Book Details</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.CoverUrl))
+            {
+                <img src="@Model.CoverUrl" alt="@Model.Title" class="img-fluid mb-3" />
+            }
+            else
+            {
+                <div class="card bg-light mb-3" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <div class="text-center text-muted">No Cover Available</div>
+                </div>
+            }
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@Model.Title</h3>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ISBN13)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.ISBN13)</dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.PublishDate)</dt>
+                        <dd class="col-sm-9">
+                            @(Model.PublishDate.HasValue ? Model.PublishDate.Value.ToString("yyyy-MM-dd") : "")
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NumberOfPages)</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.NumberOfPages)</dd>
+
+                        <dt class="col-sm-3">Authors</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.BookAuthors != null && Model.BookAuthors.Any())
+                            {
+                                <ul>
+                                    @foreach (var bookAuthor in Model.BookAuthors)
+                                    {
+                                        <li>@bookAuthor.Author?.Name</li>
+                                    }
+                                </ul>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Subjects</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.BookSubjects != null && Model.BookSubjects.Any())
+                            {
+                                <ul>
+                                    @foreach (var bookSubject in Model.BookSubjects)
+                                    {
+                                        <li>@bookSubject.Subject?.Name</li>
+                                    }
+                                </ul>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
