@@ -110,7 +110,7 @@ Our CRUD operations are implemented using direct SQL queries instead of Entity F
 ## Technologies Used
 
 - **ASP.NET Core MVC**: Web application framework
-- **SQL Database**: Data storage with direct SQL queries
+- **SQL Database**: Data storage with direct SQL queries, hosted on [SupaBase](https://supabase.com/)
 - **JavaScript/jQuery**: Client-side interactivity
 - **Bootstrap**: Responsive layout and components
 - **Chart.js**: Data visualization
