@@ -1,0 +1,368 @@
+/* Base styling */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: #f7fbff;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+/* Header with soft light blue gradient */
+header {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+    color: #2c3e50;
+    text-align: center;
+    padding: 40px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+    header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    header p {
+        font-size: 1.1rem;
+        margin-top: 10px;
+        color: #34495e;
+    }
+
+/* Navigation bar in medium blue */
+nav {
+    background-color: #74b9ff;
+    display: flex;
+    justify-content: center;
+    padding: 12px 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+    nav a {
+        margin: 0 20px;
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
+
+        nav a:hover {
+            color: #dfe6e9;
+            text-decoration: underline;
+        }
+
+/* Page layout */
+.content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Chart sections with white card styling */
+.chart-container {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    margin-bottom: 60px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .chart-container:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    }
+
+/* Chart titles and descriptions */
+h2 {
+    text-align: center;
+    color: #2d3436;
+    margin-bottom: 10px;
+    font-size: 1.6rem;
+}
+
+.description {
+    text-align: center;
+    color: #636e72;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+
+/* Base styling */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7fbff;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+/* Header - subtle light blue gradient */
+header {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+    color: #2c3e50;
+    text-align: center;
+    padding: 50px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+    header h1 {
+        margin: 0;
+        font-size: 2.7rem;
+        letter-spacing: 0.5px;
+    }
+
+    header p {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        color: #34495e;
+    }
+
+/* Navigation bar */
+nav {
+    background-color: #74b9ff;
+    display: flex;
+    justify-content: center;
+    padding: 14px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+    nav a {
+        margin: 0 20px;
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
+
+        nav a:hover {
+            color: #dfe6e9;
+            text-decoration: underline;
+        }
+
+/* Main content wrapper */
+.content {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+/* Card-style sections */
+.section {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+}
+
+    .section:hover {
+        transform: translateY(-4px);
+    }
+
+    .section h2 {
+        color: #0984e3;
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 1.7rem;
+    }
+
+        .section h2 img {
+            width: 220px;
+            height: auto;
+        }
+
+    .section p, .section ul {
+        color: #4a4a4a;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .section ul {
+        text-align: left;
+        max-width: 800px;
+        margin: 0 auto;
+        padding-left: 1.2rem;
+    }
+
+/* CTA buttons */
+.buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+    .buttons a {
+        background-color: #0984e3;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 10px;
+        display: inline-block;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .buttons a:hover {
+            background-color: #74b9ff;
+            transform: scale(1.05);
+        }
+
+
+
+/* Base */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7fbff;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+/* Hero header */
+header {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+    color: #2c3e50;
+    text-align: center;
+    padding: 50px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+    header h1 {
+        font-size: 2.7rem;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    header p {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        color: #34495e;
+    }
+/* Improve team member image and spacing */
+.team-member img {
+    width: 160px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+/* Center all content in team sections */
+.team-member h2,
+.team-member p,
+.team-member ul {
+    text-align: center;
+}
+
+/* Center bullet points */
+.team-member ul {
+    list-style-position: inside;
+    padding-left: 0;
+    line-height: 1.8;
+}
+
+/* Add spacing for team members */
+.team-member {
+    margin-bottom: 50px;
+}
+
+
+/* Navigation */
+nav {
+    background-color: #74b9ff;
+    display: flex;
+    justify-content: center;
+    padding: 14px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+    nav a {
+        margin: 0 20px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
+
+        nav a:hover {
+            color: #dfe6e9;
+            text-decoration: underline;
+        }
+
+/* Content layout */
+.content {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+/* Section cards */
+.section {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+}
+
+    .section:hover {
+        transform: translateY(-4px);
+    }
+
+    .section h2 {
+        color: #0984e3;
+        text-align: center;
+        margin-bottom: 16px;
+        font-size: 1.7rem;
+    }
+
+    .section p, .section ul {
+        color: #4a4a4a;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .section ul {
+        text-align: left;
+        max-width: 800px;
+        margin: 0 auto;
+        padding-left: 1.2rem;
+    }
+
+/* Action Buttons */
+.buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+    .buttons a {
+        background-color: #0984e3;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 10px;
+        display: inline-block;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .buttons a:hover {
+            background-color: #74b9ff;
+            transform: scale(1.05);
+        }
+
+
+.data-model {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px auto;
+}
