@@ -263,53 +263,262 @@ namespace FinalProject_Team1.Controllers
         // GET: Book/Create
         public IActionResult Create()
         {
-            ViewData["Authors"] = new SelectList(_context.Authors, "AuthorId", "Name");
-            ViewData["Subjects"] = new SelectList(_context.Subjects, "SubjectId", "Name");
-            return View();
+            try
+            {
+                // Get authors for dropdown
+                var authors = new List<SelectListItem>();
+                var subjects = new List<SelectListItem>();
+                
+                using (var connection = _context.Database.GetDbConnection())
+                {
+                    connection.Open();
+                    
+                    // Get all authors
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT author_id, name FROM author ORDER BY name";
+                        
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                authors.Add(new SelectListItem
+                                {
+                                    Value = reader.GetInt32(0).ToString(),
+                                    Text = reader.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                    
+                    // Get all subjects
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT subject_id, name FROM subject ORDER BY name";
+                        
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                subjects.Add(new SelectListItem
+                                {
+                                    Value = reader.GetInt32(0).ToString(),
+                                    Text = reader.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                ViewBag.Authors = new SelectList(authors, "Value", "Text");
+                ViewBag.Subjects = new SelectList(subjects, "Value", "Text");
+                
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Explore Create action");
+                ViewBag.DatabaseError = "Could not load authors and subjects. Error: " + ex.Message;
+                return View(new Book { Title = string.Empty });
+            }
         }
 
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookId,Title,ISBN13,PublishDate,NumberOfPages,CoverUrl,Description")] Book book, int[] selectedAuthors, int[] selectedSubjects)
+        public async Task<IActionResult> Create([Bind("Title,ISBN13,PublishDate,NumberOfPages,CoverUrl,Description")] Book book, int[] selectedAuthors, int[] selectedSubjects)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-
-                // Add selected authors
-                if (selectedAuthors != null)
+                try
                 {
-                    foreach (var authorId in selectedAuthors)
-                    {
-                        _context.BookAuthors.Add(new BookAuthor
+                    await ExecuteWithRetryAsync(async () => {
+                        using (var connection = _context.Database.GetDbConnection())
                         {
-                            BookId = book.BookId,
-                            AuthorId = authorId
-                        });
-                    }
+                            await connection.OpenAsync();
+                            using (var transaction = await connection.BeginTransactionAsync())
+                            {
+                                try
+                                {
+                                    int bookId = 0;
+                                    
+                                    // Insert the book
+                                    using (var command = connection.CreateCommand())
+                                    {
+                                        command.Transaction = transaction;
+                                        command.CommandText = @"
+                                            INSERT INTO book (title, isbn_13, publish_date, number_of_pages, cover_url, description)
+                                            VALUES (@title, @isbn13, @publishDate, @numberOfPages, @coverUrl, @description)
+                                            RETURNING book_id";
+                                        
+                                        var titleParam = command.CreateParameter();
+                                        titleParam.ParameterName = "@title";
+                                        titleParam.Value = book.Title;
+                                        command.Parameters.Add(titleParam);
+                                        
+                                        var isbnParam = command.CreateParameter();
+                                        isbnParam.ParameterName = "@isbn13";
+                                        isbnParam.Value = book.ISBN13 != null ? (object)book.ISBN13 : DBNull.Value;
+                                        command.Parameters.Add(isbnParam);
+                                        
+                                        var publishDateParam = command.CreateParameter();
+                                        publishDateParam.ParameterName = "@publishDate";
+                                        publishDateParam.Value = book.PublishDate.HasValue ? (object)book.PublishDate.Value : DBNull.Value;
+                                        command.Parameters.Add(publishDateParam);
+                                        
+                                        var pagesParam = command.CreateParameter();
+                                        pagesParam.ParameterName = "@numberOfPages";
+                                        pagesParam.Value = book.NumberOfPages.HasValue ? (object)book.NumberOfPages.Value : DBNull.Value;
+                                        command.Parameters.Add(pagesParam);
+                                        
+                                        var coverUrlParam = command.CreateParameter();
+                                        coverUrlParam.ParameterName = "@coverUrl";
+                                        coverUrlParam.Value = book.CoverUrl != null ? (object)book.CoverUrl : DBNull.Value;
+                                        command.Parameters.Add(coverUrlParam);
+                                        
+                                        var descriptionParam = command.CreateParameter();
+                                        descriptionParam.ParameterName = "@description";
+                                        descriptionParam.Value = book.Description != null ? (object)book.Description : DBNull.Value;
+                                        command.Parameters.Add(descriptionParam);
+                                        
+                                        // Get the newly inserted book ID
+                                        using (var reader = await command.ExecuteReaderAsync())
+                                        {
+                                            if (await reader.ReadAsync())
+                                            {
+                                                bookId = reader.GetInt32(0);
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Insert author associations
+                                    if (selectedAuthors != null && selectedAuthors.Length > 0)
+                                    {
+                                        foreach (var authorId in selectedAuthors)
+                                        {
+                                            using (var command = connection.CreateCommand())
+                                            {
+                                                command.Transaction = transaction;
+                                                command.CommandText = "INSERT INTO book_author (book_id, author_id) VALUES (@bookId, @authorId)";
+                                                
+                                                var bookIdParam = command.CreateParameter();
+                                                bookIdParam.ParameterName = "@bookId";
+                                                bookIdParam.Value = bookId;
+                                                command.Parameters.Add(bookIdParam);
+                                                
+                                                var authorIdParam = command.CreateParameter();
+                                                authorIdParam.ParameterName = "@authorId";
+                                                authorIdParam.Value = authorId;
+                                                command.Parameters.Add(authorIdParam);
+                                                
+                                                await command.ExecuteNonQueryAsync();
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Insert subject associations
+                                    if (selectedSubjects != null && selectedSubjects.Length > 0)
+                                    {
+                                        foreach (var subjectId in selectedSubjects)
+                                        {
+                                            using (var command = connection.CreateCommand())
+                                            {
+                                                command.Transaction = transaction;
+                                                command.CommandText = "INSERT INTO book_subject (book_id, subject_id) VALUES (@bookId, @subjectId)";
+                                                
+                                                var bookIdParam = command.CreateParameter();
+                                                bookIdParam.ParameterName = "@bookId";
+                                                bookIdParam.Value = bookId;
+                                                command.Parameters.Add(bookIdParam);
+                                                
+                                                var subjectIdParam = command.CreateParameter();
+                                                subjectIdParam.ParameterName = "@subjectId";
+                                                subjectIdParam.Value = subjectId;
+                                                command.Parameters.Add(subjectIdParam);
+                                                
+                                                await command.ExecuteNonQueryAsync();
+                                            }
+                                        }
+                                    }
+                                    
+                                    await transaction.CommitAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    await transaction.RollbackAsync();
+                                    throw new Exception("Error creating book: " + ex.Message, ex);
+                                }
+                            }
+                        }
+                        return true;
+                    });
+                    
+                    return RedirectToAction(nameof(Index));
                 }
-
-                // Add selected subjects
-                if (selectedSubjects != null)
+                catch (Exception ex)
                 {
-                    foreach (var subjectId in selectedSubjects)
-                    {
-                        _context.BookSubjects.Add(new BookSubject
-                        {
-                            BookId = book.BookId,
-                            SubjectId = subjectId
-                        });
-                    }
+                    _logger.LogError(ex, "Error in Explore Create POST action");
+                    ModelState.AddModelError("", "Could not create the book. Error: " + ex.Message);
                 }
-
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["Authors"] = new SelectList(_context.Authors, "AuthorId", "Name");
-            ViewData["Subjects"] = new SelectList(_context.Subjects, "SubjectId", "Name");
+            
+            // If we got this far, something failed, redisplay form
+            try
+            {
+                // Get authors for dropdown
+                var authors = new List<SelectListItem>();
+                var subjects = new List<SelectListItem>();
+                
+                using (var connection = _context.Database.GetDbConnection())
+                {
+                    connection.Open();
+                    
+                    // Get all authors
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT author_id, name FROM author ORDER BY name";
+                        
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                authors.Add(new SelectListItem
+                                {
+                                    Value = reader.GetInt32(0).ToString(),
+                                    Text = reader.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                    
+                    // Get all subjects
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT subject_id, name FROM subject ORDER BY name";
+                        
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                subjects.Add(new SelectListItem
+                                {
+                                    Value = reader.GetInt32(0).ToString(),
+                                    Text = reader.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                ViewBag.Authors = new SelectList(authors, "Value", "Text");
+                ViewBag.Subjects = new SelectList(subjects, "Value", "Text");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading authors and subjects for Create form");
+                ViewBag.DatabaseError = "Could not load authors and subjects. Error: " + ex.Message;
+            }
+            
             return View(book);
         }
 
