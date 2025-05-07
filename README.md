@@ -118,7 +118,7 @@ Our CRUD operations are implemented using direct SQL queries instead of Entity F
 
 ## Team Members
 
-- **Felix Schaefer**: Created CRUD function buttons and hosted GitHub repository
-- **Chau Vo**: Created About Us page and updated CSS file
-- **Tra Le**: Created Home page, Data Visualization, and the Logical Data Model diagram
-- **Chris Brown**: Created CRUD pages and associated functionality
+- **Felix Schaefer**: Created Buttons for CRUD functions. Created documentation for the project. Created Presentation Slidedeck on Canva.
+- **Chau Vo**: Created About Us page. Updated CSS files and style of Explore page. Implemented MVC architecture for Home, Data Visual, and About Us page. Deployed web application to Azure.
+- **Tra Le**: Created Home page, Data Visualization. Created the Logical Data Model diagram. Added Open library API.
+- **Chris Brown**: Created CRUD page and buttons. Adjusted code for CRUD operations. Tested Website and Identified faulty functionality.
